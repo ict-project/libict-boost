@@ -1,11 +1,11 @@
 //! @file
-//! @brief libict-boost - Header file.
+//! @brief Connection module - Source file.
 //! @author Mariusz Ornowski (mariusz.ornowski@ict-project.pl)
 //! @version 1.0
-//! @date 2017
+//! @date 2016-2017
 //! @copyright ICT-Project Mariusz Ornowski (ict-project.pl)
 /* **************************************************************
-Copyright (c) 2017, ICT-Project Mariusz Ornowski (ict-project.pl)
+Copyright (c) 2016-2017, ICT-Project Mariusz Ornowski (ict-project.pl)
 All rights reserved.
 
 Redistribution and use in source and binary forms, with or without
@@ -33,13 +33,28 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **************************************************************/
-#ifndef _LIBICT_BOOST_HEADER
-#define _LIBICT_BOOST_HEADER
 //============================================
-#include "asio.hpp"
-#include "resolver.hpp"
 #include "connection.hpp"
-#include "client.hpp"
-#include "server.hpp"
-//===========================================
+//============================================
+#ifdef ENABLE_TESTING
+#include "test.hpp"
 #endif
+//============================================
+namespace ict { namespace boost { namespace connection {
+//============================================
+Top::Top(){
+}
+Top::~Top(){
+}
+std::string Top::socketDesc() const {
+  return(sDesc);
+}
+//============================================
+}}}
+//============================================
+#ifdef ENABLE_TESTING
+//REGISTER_TEST(connection,tc1){
+//  return(0);
+//}
+#endif
+//===========================================

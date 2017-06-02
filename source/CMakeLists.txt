@@ -18,8 +18,11 @@ set(CMAKE_SOURCE_FILES_ICT
 )
 
 set(CMAKE_SOURCE_FILES
-    asio.cpp
-    resolver.cpp
+  asio.cpp
+  resolver.cpp
+  connection.cpp
+  client.cpp
+  server.cpp
 )
 
 add_library(ict STATIC ${CMAKE_SOURCE_FILES_ICT})
@@ -58,7 +61,11 @@ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/git_version.h.in ${CMAKE_CURRENT_SOUR
 install(TARGETS ict-boost-static DESTINATION lib COMPONENT libraries)
 install(FILES 
   asio.hpp
-  all.hpp 
+  resolver.hpp
+  connection.hpp
+  client.hpp
+  server.hpp
+  all.hpp
 DESTINATION include/libict-boost COMPONENT headers)
 ################################################################
 #enable_testing()

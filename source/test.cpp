@@ -37,6 +37,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "test.hpp"
 #include "git_version.h"
 #include "all.hpp"
+#include "../libict/source/logger.hpp"
 #include "../libict/source/options.hpp"
 #include <algorithm>
 //============================================
@@ -89,6 +90,7 @@ int TC::runThis(const tag_list_t & tags_in) const{
   return(0);
 }
 int TC::run(const tag_list_t & tags_in){
+  LOGGER_LAYER;
   for (const TC * tc : getList()) {
     int out=tc->runThis(tags_in);
     if (out) return(out);
@@ -185,6 +187,9 @@ OPTIONS_CONFIG(test0,0){
 int main(int argc,const char **argv){
   //std::string locale(setlocale(LC_ALL,std::getenv("LANG")));
   std::string locale(setlocale(LC_ALL,"C"));
+  LOGGER_BASEDIR;
+  LOGGER_SET(std::cerr);
+  LOGGER_DEFAULT(ict::logger::all);
   int out=OPTIONS_PARSE(argc,argv,std::cerr);
   if (out) return(out);
   if (print_help){
