@@ -37,11 +37,11 @@ deploy:
   api_key: "$GITHUB_API_KEY"
   file_glob: true
   file: 
-   - "build/smpp-test-tools-*.tar.Z"
-   - "build/smpp-test-tools-*.tar.gz"
-   - "build/smpp-test-tools-*.sh"
-   - "build/smpp-test-tools-*.deb"
-   - "build/smpp-test-tools-*.rpm"
+   - "build/libict-boost-*.tar.Z"
+   - "build/libict-boost-*.tar.gz"
+   - "build/libict-boost-*.sh"
+   - "build/libict-boost-*.deb"
+   - "build/libict-boost-*.rpm"
   skip_cleanup: true
   on:
     tags: true

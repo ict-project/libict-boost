@@ -1,5 +1,5 @@
 //! @file
-//! @brief libict-boost - Header file.
+//! @brief ASIO module - header file.
 //! @author Mariusz Ornowski (mariusz.ornowski@ict-project.pl)
 //! @version 1.0
 //! @date 2017
@@ -33,10 +33,18 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **************************************************************/
-#ifndef _LIBICT_BOOST_HEADER
-#define _LIBICT_BOOST_HEADER
+#ifndef _ASIO_HEADER
+#define _ASIO_HEADER
 //============================================
-#include "asio.hpp"
-#include "resolver.hpp"
+#include <map>
+#include <thread>
+#include <boost/asio.hpp>
+//============================================
+namespace ict { namespace boost { namespace asio {
+//===========================================
+::boost::asio::io_service & ioService();
+::boost::asio::io_service & ioService(std::thread::id id);
+//============================================
+}}}
 //===========================================
 #endif
