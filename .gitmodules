@@ -1,0 +1,3 @@
+[submodule "libict"]
+	path = libict
+	url = https://github.com/ict-project/libict.git
