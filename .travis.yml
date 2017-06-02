@@ -1,0 +1,47 @@
+dist: trusty
+sudo: required
+os:
+  - linux
+  - osx
+language:
+  - cpp
+compiler:
+  - gcc
+addons:
+  apt:
+    sources:
+      - ubuntu-toolchain-r-test
+    packages:
+      - gcc-5
+      - g++-5
+      - cmake
+      - rpm
+      - libboost-all-dev
+before_install:
+  - if [ "$TRAVIS_OS_NAME" == "osx" ]; then brew update; fi
+install:
+  - if [ "$TRAVIS_OS_NAME" == "linux" ] && [ "$CXX" = "g++" ]; then export CXX="g++-5" CC="gcc-5"; fi
+before_script:
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then ./build.linux.bsh; fi
+  - if [ "$TRAVIS_OS_NAME" == "osx" ];   then ./build.xcode.bsh; fi
+script:
+  - gcc -v && g++ -v && cmake --version
+  - cd build
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then make; fi
+  - if [ "$TRAVIS_OS_NAME" == "osx" ];   then xcodebuild -configuration Release; fi
+  - if [ "$TRAVIS_OS_NAME" == "linux" ]; then make package; fi
+  - if [ "$TRAVIS_OS_NAME" == "osx" ];   then cpack; fi
+  - cd ..
+deploy:
+  provider: releases
+  api_key: "$GITHUB_API_KEY"
+  file_glob: true
+  file: 
+   - "build/smpp-test-tools-*.tar.Z"
+   - "build/smpp-test-tools-*.tar.gz"
+   - "build/smpp-test-tools-*.sh"
+   - "build/smpp-test-tools-*.deb"
+   - "build/smpp-test-tools-*.rpm"
+  skip_cleanup: true
+  on:
+    tags: true
