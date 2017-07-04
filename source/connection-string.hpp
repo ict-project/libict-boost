@@ -1,5 +1,5 @@
 //! @file
-//! @brief Connection module - Source file.
+//! @brief Connection (string) module - header file.
 //! @author Mariusz Ornowski (mariusz.ornowski@ict-project.pl)
 //! @version 1.0
 //! @date 2016-2017
@@ -33,46 +33,38 @@ THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT
 (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
 OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **************************************************************/
+#ifndef _CONNECTION_STRING_HEADER
+#define _CONNECTION_STRING_HEADER
 //============================================
-#include "connection.hpp"
+#include <string>
 //============================================
-#ifdef ENABLE_TESTING
-#include "test.hpp"
-#endif
-//============================================
-namespace ict { namespace boost { namespace connection {
-//============================================
-Top::Top(){
-}
-Top::~Top(){
-}
-std::string Top::socketDesc() const {
-  return(sDesc);
-}
-//============================================
-TopString::~TopString(){
-}
-void TopString::doRead(){
-  if ((readSize+readString.size())<readString.max_size()){
-    readString.append((char*)readData,readSize);
-    readSize=0;
-  }
-  stringRead();
-}
-void TopString::doWrite(){
-  stringWrite();
-  while(writeString.size()){
-    writeSize=writeString.copy((char*)writeData,bufferSize);
-    writeString.erase(0,writeSize);
-    if (writeString.size()) asyncWrite();
-  }
-}
-//============================================
-}}}
-//============================================
-#ifdef ENABLE_TESTING
-//REGISTER_TEST(connection,tc1){
-//  return(0);
-//}
-#endif
+namespace ict { namespace boost { namespace connection { namespace string {
 //===========================================
+//! Stos do obsługi połączenia za pomocą bufora std::string  - góra.
+class Top  {
+protected:
+  //! Bufor odczytu.
+  std::string readString;
+  //! Bufor zapisu.
+  std::string writeString;
+  //!
+  //! @brief Wykonuje odczyt (funkcja obowiązkowo do nadpisania).
+  //!  Powinna ustawić przy zakończeniu nowy asynchroniczny odczyt 
+  //!  (lub ewentualnie zapis) - funkcje asyncRead() i/lub asyncWrite().
+  //!  Jeśli tego nie zrobi połączenie może być automatycznie zamknięte.
+  //!
+  virtual void stringRead()=0;
+  //!
+  //! @brief Wykonuje zapis (funkcja obowiązkowo do nadpisania).
+  //!  Powinna ustawić przy zakończeniu nowy asynchroniczny zapis 
+  //!  (lub ewentualnie odczyt) - funkcje asyncWrite() i/lub asyncRead().
+  //!  Jeśli tego nie zrobi połączenie może być automatycznie zamknięte.
+  //!
+  virtual void stringWrite()=0;
+public:
+  virtual ~Top();
+};
+//============================================
+}}}}
+//===========================================
+#endif

@@ -42,6 +42,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include "../libict/source/logger.hpp"
 #include "../libict/source/register.hpp"
 #include "asio.hpp"
+#include "connection-string.hpp"
 //============================================
 namespace ict { namespace boost { namespace connection {
 //===========================================
@@ -65,11 +66,11 @@ protected:
   std::size_t readMinFlow=0;
   //! Minimalna liczba bajtów na minutę przy zapisie (jeśli nie jest zachowana to połączene jest zamykane) - jeśli 0, to brak ograniczenia.
   std::size_t writeMinFlow=0;
-  //! Ustawienie asychronicznego odczytu (funkcja obowiązkowo do nadpisania).
+  //! Ustawienie asychronicznego odczytu (funkcja nadpisania w Bottom).
   virtual void asyncRead()=0;
-  //! Ustawienie asychronicznego zapisu (funkcja obowiązkowo do nadpisania).
+  //! Ustawienie asychronicznego zapisu (funkcja nadpisania w Bottom).
   virtual void asyncWrite()=0;
-  //! Zamyka połącznie (funkcja obowiązkowo do nadpisania).
+  //! Zamyka połącznie (funkcja nadpisania w Bottom).
   virtual void doClose()=0;
   //!
   //! @brief Wykonuje odczyt (funkcja obowiązkowo do nadpisania).
@@ -110,6 +111,15 @@ public:
   virtual ~Top();
   //! Zwraca opis połączenia.
   std::string socketDesc() const;
+};
+//============================================
+//! Stos do obsługi połączenia za pomocą bufora std::string  - góra.
+class TopString : public Top,public ict::boost::connection::string::Top {
+private:
+  void doRead();
+  void doWrite();
+public:
+  virtual ~TopString();
 };
 //============================================
 //! Stos do obsługi połączenia - dół.

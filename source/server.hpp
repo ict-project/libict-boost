@@ -43,6 +43,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 //============================================
 namespace ict { namespace boost { namespace server {
 //===========================================
+//! Klasa tworząca serwer do obsługi połączeń TCP.
 class Tcp : public resolver::Tcp {
 private:
   //! Czy serwer jest zatrzymany.
@@ -70,9 +71,12 @@ private:
   //! Rozpoczyna akceptację połączeń.
   void doAccept();
 };
+//! Fabryka tworząca serwery do obsługi połączeń TCP.
 void factory(const std::string & host,const std::string & port,ict::boost::connection::factory_tcp_t factory);
+//! Fabryka tworząca serwery do obsługi połączeń TCP.
 void factory(const std::string & host,const std::string & port,ict::boost::connection::factory_tcp_t factory,resolver::error_handler_t onError);
 //============================================
+//! Klasa tworząca serwer do obsługi połączeń lokalnych gniazd systemowych (Unix).
 class Stream : public resolver::Stream {
 private:
   //! Czy klient jest zatrzymany.
@@ -100,7 +104,9 @@ private:
   //! Rozpoczyna akceptację połączeń.
   void doAccept();
 };
+//! Fabryka tworząca serwery do obsługi połączeń lokalnych gniazd systemowych (Unix).
 void factory(const std::string & path,ict::boost::connection::factory_stream_t factory);
+//! Fabryka tworząca serwery do obsługi połączeń lokalnych gniazd systemowych (Unix).
 void factory(const std::string & path,ict::boost::connection::factory_stream_t factory,resolver::error_handler_t onError);
 //============================================
 }}}

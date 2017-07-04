@@ -20,6 +20,8 @@ set(CMAKE_SOURCE_FILES_ICT
 set(CMAKE_SOURCE_FILES
   asio.cpp
   resolver.cpp
+  connection-string.cpp
+  connection-http.cpp
   connection.cpp
   client.cpp
   server.cpp
