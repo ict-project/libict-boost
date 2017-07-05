@@ -442,6 +442,7 @@ void Headers::stringWrite(){
   if (!writing_phase){
     switch(write_all_headers()){
       case 0:{
+        asyncWrite();
         LOGGER_DEBUG<<__LOGGER__<<"write - phase_headers"<<std::endl;
         bodyWrite(phase_headers);
         writing_phase=phase_body;
