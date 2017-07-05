@@ -526,6 +526,13 @@ int Body::beforeWrite(){
   } else {
     beforeRequest();
   }
+  if (getServer()) {
+    response_content_length=response_body.size();
+    set_content_length(response_headers,response_content_length);
+  } else {
+    request_content_length=request_body.size();
+    set_content_length(request_headers,request_content_length);
+  }
   return(0);
 }
 int Body::betweenRead(){
@@ -539,13 +546,6 @@ int Body::betweenRead(){
   return(0);
 }
 int Body::betweenWrite(){
-  if (getServer()) {
-    response_content_length=response_body.size();
-    set_content_length(response_headers,response_content_length);
-  } else {
-    request_content_length=request_body.size();
-    set_content_length(request_headers,request_content_length);
-  }
   return(0);
 }
 int Body::bodyRead(){
