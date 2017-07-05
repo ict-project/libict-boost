@@ -116,10 +116,10 @@ private:
   //! Zapisuje start line i nagłówki.
   int write_all_headers();
   //! Informacja, czy nagłówki są w tej chwili odczytywane.
-  phase_t reading_phase=phase_start;
+  phase_t reading_phase;
   void stringRead();
   //! Informacja, czy nagłówki są w tej chwili zapisywane.
-  phase_t writing_phase=phase_start;
+  phase_t writing_phase;
   void stringWrite();
 protected:
   bool getServer(){return(server);}
@@ -155,7 +155,10 @@ protected:
   //!
   virtual void bodyWrite(phase_t phase)=0;
 public:
-  Headers(bool serverIn=true):server(serverIn){}
+  Headers(bool serverIn=true):
+    server(serverIn),
+    reading_phase(serverIn?phase_start:phase_body),
+    writing_phase(serverIn?phase_body:phase_start){}
 };
 //============================================
 class Body : public Headers{
