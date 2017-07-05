@@ -56,11 +56,12 @@ void TopString::doRead(){
   if ((readSize+readString.size())<readString.max_size()){
     readString.append((char*)readData,readSize);
     readSize=0;
+    asyncRead();
   }
-  if(!readString.size()) stringRead();
+  stringRead();
 }
 void TopString::doWrite(){
-  if(writeString.size()) stringWrite();
+  stringWrite();
   if(0<writeString.size()){
     writeSize=writeString.copy((char*)writeData,bufferSize);
     writeString.erase(0,writeSize);
