@@ -406,6 +406,17 @@ int Headers::write_response(){
 }
 //! Odczytuje start line i nagłówki.
 int Headers::read_all_headers(){
+  if (server){
+    request_method.clear();
+    request_uri.clear();
+    request_version.clear();
+    request_headers.clear();
+  } else {
+    response_version.clear();
+    response_code.clear();
+    response_msg.clear();
+    response_headers.clear();
+  }
   return(server?read_request():read_response());
 }
 //! Zapisuje start line i nagłówki.
