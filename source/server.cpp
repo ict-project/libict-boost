@@ -81,6 +81,7 @@ void Tcp::afterResolve(){
 bool Tcp::doBind(const ::boost::asio::ip::tcp::endpoint & ep){
   if (stopped) return(false);
   {
+    a.close();
     LOGGER_DEBUG<<__LOGGER__<<"Trying to bind "<<ep<<" ..."<<std::endl;
     {
       ::boost::system::error_code ec;
