@@ -115,7 +115,7 @@ public:
 //============================================
 //! Stos do obsługi połączenia za pomocą bufora std::string  - góra.
 class TopString : public Top,public ict::boost::connection::string::Top {
-private:
+protected:
   void doRead();
   void doWrite();
 public:

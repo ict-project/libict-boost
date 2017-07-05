@@ -72,6 +72,7 @@ extern const std::string _PATCH_;
 extern const std::string _HTTP_1_0_;
 extern const std::string _HTTP_1_1_;
 extern const std::string _content_length_;
+extern const std::string _content_type_;
 extern header_config_t default_config;
 extern config_t config;
 //===========================================
@@ -120,6 +121,8 @@ private:
   //! Informacja, czy nagłówki są w tej chwili zapisywane.
   phase_t writing_phase=phase_start;
   void stringWrite();
+protected:
+  bool getServer(){return(server);}
   void doStart(){
     if (server) {
       asyncRead();
@@ -127,8 +130,6 @@ private:
       asyncWrite();
     }
   }
-protected:
-  bool getServer(){return(server);}
   std::string request_method;
   std::string request_uri;
   std::string request_version;

@@ -58,9 +58,11 @@ const std::string _PATCH_("PATCH");
 const std::string _HTTP_1_0_("HTTP/1.0");
 const std::string _HTTP_1_1_("HTTP/1.1");
 const std::string _content_length_("content-length");
+const std::string _content_type_("content-type");
 header_config_t default_config={.multiple_values=true,.multiple_lines=true};
 config_t config={
-  {_content_length_,{.multiple_values=false,.multiple_lines=false}}
+  {_content_length_,      {.multiple_values=false,.multiple_lines=false}},
+  {_content_type_,        {.multiple_values=false,.multiple_lines=false}}
 };
 //============================================
 void Headers::transform_name(std::string & name){
@@ -534,8 +536,42 @@ void Body::bodyWrite(phase_t phase){
 }}}}
 //============================================
 #ifdef ENABLE_TESTING
-//REGISTER_TEST(connection,tc1){
-//  return(0);
-//}
+#include "server.hpp"
+class TestServer : public ict::boost::connection::http::Server{
+private:
+  void beforeRequest(){}
+  void afterRequest(){
+    response_version=ict::boost::connection::http::_HTTP_1_0_;
+    response_code="200";
+    response_msg="OK";
+    if (request_method==ict::boost::connection::http::_GET_){
+      response_body="Czesc!!!";
+      response_headers[ict::boost::connection::http::_content_type_].push_back("text/text");
+    } else if (request_method==ict::boost::connection::http::_POST_) {
+      response_body=request_body;
+      response_headers[ict::boost::connection::http::_content_type_].push_back("text/text");
+    } else {
+      response_code="405";
+      response_msg="Method not allowed";
+    }
+  }
+  void beforeResponse(){}
+  void afterResponse(){}
+public:
+  TestServer(){
+    ict::reg::get<TestServer>().add(this);
+  }
+  ~TestServer(){
+    ict::reg::get<TestServer>().del(this);
+  }
+};
+REGISTER_TEST(connection_http,tc1){
+  ict::boost::server::factory("localhost","4567",[](::boost::asio::ip::tcp::socket & socket){
+    auto ptr=std::make_shared<ict::boost::connection::Bottom<boost::asio::ip::tcp::socket,TestServer>>(socket);
+    if (ptr) ptr->initThis();
+  });
+  ict::reg::get<TestServer>().destroy();
+  return(0);
+}
 #endif
 //===========================================
