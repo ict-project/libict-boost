@@ -426,7 +426,7 @@ void  Headers::stringRead(){
         reading_phase=phase_body;
       }break;
       case 1:asyncRead();break;
-      default:break;
+      default:doClose();break;
     }
   } else {
     LOGGER_DEBUG<<__LOGGER__<<"read - phase_body"<<std::endl;
@@ -447,7 +447,7 @@ void Headers::stringWrite(){
         writing_phase=phase_body;
       }break;
       case 1:asyncWrite();break;
-      default:break;
+      default:doClose();break;
     }
   } else {
     LOGGER_DEBUG<<__LOGGER__<<"write - phase_start"<<std::endl;
