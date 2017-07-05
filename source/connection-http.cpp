@@ -46,6 +46,17 @@ const std::string endl("\r\n");
 const std::string space(" ");
 const std::string colon(":");
 const std::string comma(",");
+const std::string _GET_("GET");
+const std::string _HEAD_("HEAD");
+const std::string _POST_("POST");
+const std::string _PUT_("PUT");
+const std::string _DELETE_("DELETE");
+const std::string _CONNECT_("CONNECT");
+const std::string _OPTIONS_("OPTIONS");
+const std::string _TRACE_("TRACE");
+const std::string _PATCH_("PATCH");
+const std::string _HTTP_1_0_("HTTP/1.0");
+const std::string _HTTP_1_1_("HTTP/1.1");
 const std::string _content_length_("content-length");
 header_config_t default_config={.multiple_values=true,.multiple_lines=true};
 config_t config={
@@ -427,7 +438,7 @@ void Headers::stringWrite(){
 }
 //============================================
 void Body::get_content_length(headers_t & headers,std::size_t & size){
-  size=-1;
+  size=0;
   if (headers.count(_content_length_))
     if (headers.at(_content_length_).size()){
       try {
@@ -437,8 +448,8 @@ void Body::get_content_length(headers_t & headers,std::size_t & size){
     }
 }
 void Body::set_content_length(headers_t & headers,std::size_t & size){
-  headers[_content_length_].clear();
-  headers[_content_length_].push_back(std::to_string(size));
+  if (headers.count(_content_length_)) headers.erase(_content_length_);
+  if (size) headers[_content_length_].push_back(std::to_string(size));
 }
 bool Body::read_body(std::string & body,std::size_t & content_length){
   std::size_t s=(content_length>body.size())?(content_length-body.size()):0;
@@ -467,17 +478,9 @@ void Body::bodyRead(phase_t phase){
     case phase_headers:{
       if (getServer()) {
         get_content_length(request_headers,request_content_length);
-        if (request_content_length==-1){
-          LOGGER_WARN<<__LOGGER__<<"Header error: "<<_content_length_<<std::endl;
-          return;
-        }
         request_body.clear();
       } else {
         get_content_length(response_headers,response_content_length);
-        if (response_content_length==-1){
-          LOGGER_WARN<<__LOGGER__<<"Header error: "<<_content_length_<<std::endl;
-          return;
-        }
         response_body.clear();
       }
     }
