@@ -68,6 +68,7 @@ void TopString::doWrite(){
   } else {
     stringWrite();
   }
+  if (!writeString.size()) if (closeStringWrite) doClose();
 }
 //============================================
 }}}

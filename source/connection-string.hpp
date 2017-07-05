@@ -43,6 +43,8 @@ namespace ict { namespace boost { namespace connection { namespace string {
 //! Stos do obsługi połączenia za pomocą bufora std::string  - góra.
 class Top  {
 protected:
+  //! Zamknij połaczenie, gdy skończysz zapis.
+  bool closeStringWrite=false;
   //! Bufor odczytu.
   std::string readString;
   //! Bufor zapisu.
