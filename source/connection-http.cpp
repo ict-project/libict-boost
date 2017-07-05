@@ -452,28 +452,28 @@ void Headers::stringRead(){
 void Headers::stringWrite(){
   switch(writing_phase){
     case phase_before:{
-      LOGGER_DEBUG<<__LOGGER__<<"read - phase_start"<<std::endl;
-      READ_WRITE_2(beforeRead());
+      LOGGER_DEBUG<<__LOGGER__<<"write - phase_start"<<std::endl;
+      READ_WRITE_2(beforeWrite());
       writing_phase=phase_headers;
     }
     case phase_headers:{
-      LOGGER_DEBUG<<__LOGGER__<<"read - phase_headers"<<std::endl;
-      READ_WRITE_2(read_all_headers());
+      LOGGER_DEBUG<<__LOGGER__<<"write - phase_headers"<<std::endl;
+      READ_WRITE_2(write_all_headers());
       writing_phase=phase_between;
     }
     case phase_between:{
-      LOGGER_DEBUG<<__LOGGER__<<"read - phase_between"<<std::endl;
-      READ_WRITE_2(betweenRead());
+      LOGGER_DEBUG<<__LOGGER__<<"write - phase_between"<<std::endl;
+      READ_WRITE_2(betweenWrite());
       writing_phase=phase_body;
     }
     case phase_body:{
-      LOGGER_DEBUG<<__LOGGER__<<"read - phase_body"<<std::endl;
-      READ_WRITE_2(bodyRead());
+      LOGGER_DEBUG<<__LOGGER__<<"write - phase_body"<<std::endl;
+      READ_WRITE_2(bodyWrite());
       writing_phase=phase_after;
     }
     case phase_after:{
-      LOGGER_DEBUG<<__LOGGER__<<"read - phase_after"<<std::endl;
-      READ_WRITE_2(afterRead());
+      LOGGER_DEBUG<<__LOGGER__<<"write - phase_after"<<std::endl;
+      READ_WRITE_2(afterWrite());
       writing_phase=phase_end;
     }
     default:break;
