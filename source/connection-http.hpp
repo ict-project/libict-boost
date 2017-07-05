@@ -139,9 +139,25 @@ protected:
   std::string response_msg;
   headers_t   response_headers;
   //! Rozpoczyna odczyt nagłówków.
-  void headersRead(){reading_phase=phase_start;asyncRead();}
+  void headersRead(){
+    if (server){
+      request_method.clear();
+      request_uri.clear();
+      request_version.clear();
+      request_headers.clear();
+    } else {
+      response_version.clear();
+      response_code.clear();
+      response_msg.clear();
+      response_headers.clear();
+    }
+    reading_phase=phase_start;asyncRead();
+  }
   //! Rozpoczyna zapis nagłówków.
-  void headersWrite(){writing_phase=phase_start;asyncWrite();}
+  void headersWrite(){
+    writing_phase=phase_start;
+    asyncWrite();
+  }
   //!
   //! Obsługuje odczyt body (funkcja do nadpisania).
   //!
