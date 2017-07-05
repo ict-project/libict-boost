@@ -280,10 +280,42 @@ private:
 protected:
   std::string request_body;
   std::string response_body;
-  virtual void beforeRequest(){}
-  virtual void afterRequest(){}
-  virtual void beforeResponse(){}
-  virtual void afterResponse(){}
+  //!
+  //! Operacje przed request.
+  //!
+  //! @return Wartosci:
+  //!  @li 0 - zakończone;
+  //!  @li 1 - jeszcze trwa;
+  //!  @li -1 - wystąpił błąd.
+  //!
+  virtual int beforeRequest(){return(0);}
+  //!
+  //! Operacje po request.
+  //!
+  //! @return Wartosci:
+  //!  @li 0 - zakończone;
+  //!  @li 1 - jeszcze trwa;
+  //!  @li -1 - wystąpił błąd.
+  //!
+  virtual int afterRequest(){return(0);}
+  //!
+  //! Operacje przed response.
+  //!
+  //! @return Wartosci:
+  //!  @li 0 - zakończone;
+  //!  @li 1 - jeszcze trwa;
+  //!  @li -1 - wystąpił błąd.
+  //!
+  virtual int beforeResponse(){return(0);}
+  //!
+  //! Operacje po response.
+  //!
+  //! @return Wartosci:
+  //!  @li 0 - zakończone;
+  //!  @li 1 - jeszcze trwa;
+  //!  @li -1 - wystąpił błąd.
+  //!
+  virtual int afterResponse(){return(0);}
 public:
   Body(bool serverIn=true):Headers(serverIn){}
 };

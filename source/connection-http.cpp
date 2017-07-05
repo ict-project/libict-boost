@@ -203,7 +203,7 @@ int Headers::write_start_last(std::string & input,std::size_t max,const std::str
   }
   return(0);
 }
-#define READ_WRITE(operation)\
+#define READ_WRITE_1(operation)\
   switch(operation){\
     case 0:break;\
     case 1:return(1);\
@@ -216,9 +216,9 @@ int Headers::read_request_line(){
   static const std::size_t min_uri_size(1);
   static const std::size_t max_uri_size(10000);
   static const std::size_t max_version_size(10);
-  READ_WRITE(read_start_element(request_method,min_method_size,max_method_size,"HTTP request method"))
-  READ_WRITE(read_start_element(request_uri,min_uri_size,max_uri_size,"HTTP request URI"))
-  READ_WRITE(read_start_last(request_version,max_version_size,"HTTP request version"))
+  READ_WRITE_1(read_start_element(request_method,min_method_size,max_method_size,"HTTP request method"))
+  READ_WRITE_1(read_start_element(request_uri,min_uri_size,max_uri_size,"HTTP request URI"))
+  READ_WRITE_1(read_start_last(request_version,max_version_size,"HTTP request version"))
   return(0);
 }
 //! Zapisuje start line (dla request).
@@ -228,9 +228,9 @@ int Headers::write_request_line(){
   static const std::size_t min_uri_size(1);
   static const std::size_t max_uri_size(10000);
   static const std::size_t max_version_size(10);
-  READ_WRITE(write_start_element(request_method,min_method_size,max_method_size,"HTTP request method"))
-  READ_WRITE(write_start_element(request_uri,min_uri_size,max_uri_size,"HTTP request URI"))
-  READ_WRITE(write_start_last(request_version,max_version_size,"HTTP request version"))
+  READ_WRITE_1(write_start_element(request_method,min_method_size,max_method_size,"HTTP request method"))
+  READ_WRITE_1(write_start_element(request_uri,min_uri_size,max_uri_size,"HTTP request URI"))
+  READ_WRITE_1(write_start_last(request_version,max_version_size,"HTTP request version"))
   return(0);
 }
 //! Odczytuje start line (dla response).
@@ -240,9 +240,9 @@ int Headers::read_status_line(){
   static const std::size_t min_code_size(3);
   static const std::size_t max_code_size(4);
   static const std::size_t max_msg_size(1000);
-  READ_WRITE(read_start_element(response_version,min_version_size,max_version_size,"HTTP response version"))
-  READ_WRITE(read_start_element(response_code,min_code_size,max_code_size,"HTTP response code"))
-  READ_WRITE(read_start_last(response_msg,max_msg_size,"HTTP response message"))
+  READ_WRITE_1(read_start_element(response_version,min_version_size,max_version_size,"HTTP response version"))
+  READ_WRITE_1(read_start_element(response_code,min_code_size,max_code_size,"HTTP response code"))
+  READ_WRITE_1(read_start_last(response_msg,max_msg_size,"HTTP response message"))
   return(0);
 }
 //! Zapisuje start line (dla response).
@@ -252,9 +252,9 @@ int Headers::write_status_line(){
   static const std::size_t min_code_size(3);
   static const std::size_t max_code_size(4);
   static const std::size_t max_msg_size(1000);
-  READ_WRITE(write_start_element(response_version,min_version_size,max_version_size,"HTTP response version"))
-  READ_WRITE(write_start_element(response_code,min_code_size,max_code_size,"HTTP response code"))
-  READ_WRITE(write_start_last(response_msg,max_msg_size,"HTTP response message"))
+  READ_WRITE_1(write_start_element(response_version,min_version_size,max_version_size,"HTTP response version"))
+  READ_WRITE_1(write_start_element(response_code,min_code_size,max_code_size,"HTTP response code"))
+  READ_WRITE_1(write_start_last(response_msg,max_msg_size,"HTTP response message"))
   return(0);
 }
 //! Odczytuje nagłówki.
@@ -382,26 +382,26 @@ int Headers::write_headers(headers_t & headers){
 }
 //! Odczytuje start line i nagłówki (dla request).
 int Headers::read_request(){
-  READ_WRITE(read_request_line())
-  READ_WRITE(read_headers(request_headers))
+  READ_WRITE_1(read_request_line())
+  READ_WRITE_1(read_headers(request_headers))
   return(0);
 }
 //! Zapisuje start line i nagłówki (dla request).
 int Headers::write_request(){
-  READ_WRITE(write_request_line())
-  READ_WRITE(write_headers(request_headers))
+  READ_WRITE_1(write_request_line())
+  READ_WRITE_1(write_headers(request_headers))
   return(0);
 }
 //! Odczytuje start line i nagłówki (dla response).
 int Headers::read_response(){
-  READ_WRITE(read_status_line())
-  READ_WRITE(read_headers(response_headers))
+  READ_WRITE_1(read_status_line())
+  READ_WRITE_1(read_headers(response_headers))
   return(0);
 }
 //! Zapisuje start line i nagłówki (dla response).
 int Headers::write_response(){
-  READ_WRITE(write_status_line())
-  READ_WRITE(write_headers(response_headers))
+  READ_WRITE_1(write_status_line())
+  READ_WRITE_1(write_headers(response_headers))
   return(0);
 }
 //! Odczytuje start line i nagłówki.
@@ -514,17 +514,17 @@ int Body::write_body(std::string & body,std::size_t & content_length){
 }
 int Body::beforeRead(){
   if (getServer()) {
-    beforeRequest();
+    READ_WRITE_1(beforeRequest())
   } else {
-    beforeResponse();
+    READ_WRITE_1(beforeResponse())
   }
   return(0);
 }
 int Body::beforeWrite(){
   if (getServer()) {
-    beforeResponse();
+    READ_WRITE_1(beforeResponse())
   } else {
-    beforeRequest();
+    READ_WRITE_1(beforeRequest())
   }
   if (getServer()) {
     response_content_length=response_body.size();
@@ -556,17 +556,17 @@ int Body::bodyWrite(){
 }
 int Body::afterRead(){
   if (getServer()) {
-    afterRequest();
+    READ_WRITE_1(afterRequest())
   } else {
-    afterResponse();
+    READ_WRITE_1(afterResponse())
   }
   return(0);
 }
 int Body::afterWrite(){
   if (getServer()) {
-    afterResponse();
+    READ_WRITE_1(afterResponse())
   } else {
-    afterRequest();
+    READ_WRITE_1(afterRequest())
   }
   return(0);
 }
@@ -577,8 +577,8 @@ int Body::afterWrite(){
 #include "server.hpp"
 class TestServer : public ict::boost::connection::http::Server{
 private:
-  void beforeRequest(){}
-  void afterRequest(){
+  int afterRequest(){
+    LOGGER_DEBUG<<__LOGGER__<<request_method<<" "<<request_uri<<" "<<request_version<<std::endl;
     response_version=ict::boost::connection::http::_HTTP_1_0_;
     response_code="200";
     response_msg="OK";
@@ -592,9 +592,14 @@ private:
       response_code="405";
       response_msg="Method not allowed";
     }
+    startWrite();
+    return(0);
   }
-  void beforeResponse(){}
-  void afterResponse(){}
+  int afterResponse(){
+    //startRead();
+    closeStringWrite=true;
+    return(0);
+  }
 public:
   TestServer(){
     ict::reg::get<TestServer>().add(this);
