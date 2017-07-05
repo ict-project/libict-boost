@@ -43,9 +43,12 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 namespace ict { namespace boost { namespace connection { namespace http {
 //===========================================
 enum phase_t {
-  phase_start=-1,
-  phase_headers=0,
-  phase_body=1
+  phase_before,
+  phase_headers,
+  phase_between,
+  phase_body,
+  phase_after,
+  phase_end
 };
 struct header_config_t {
   //Czy nagłówek może mieć wiele wartośći.
@@ -139,7 +142,7 @@ protected:
   std::string response_msg;
   headers_t   response_headers;
   //! Rozpoczyna odczyt nagłówków.
-  void headersRead(){
+  void startRead(){
     if (server){
       request_method.clear();
       request_uri.clear();
@@ -151,31 +154,91 @@ protected:
       response_msg.clear();
       response_headers.clear();
     }
-    reading_phase=phase_start;
+    reading_phase=phase_before;
     asyncRead();
   }
   //! Rozpoczyna zapis nagłówków.
-  void headersWrite(){
-    writing_phase=phase_start;
+  void startWrite(){
+    writing_phase=phase_before;
     asyncWrite();
   }
   //!
+  //! Funkcja wykonywana przed odczytem nagłówków (funkcja do nadpisania).
+  //!
+  //! @return Wartosci:
+  //!  @li 0 - zakończone;
+  //!  @li 1 - jeszcze trwa;
+  //!  @li -1 - wystąpił błąd.
+  //!
+  virtual int beforeRead()=0;
+  //!
+  //! Funkcja wykonywana przed zapisem nagłówków (funkcja do nadpisania).
+  //!
+  //! @return Wartosci:
+  //!  @li 0 - zakończone;
+  //!  @li 1 - jeszcze trwa;
+  //!  @li -1 - wystąpił błąd.
+  //!
+  virtual int beforeWrite()=0;
+  //!
+  //! Funkcja wykonywana pomiędzy odczytem nagłówków i body (funkcja do nadpisania).
+  //!
+  //! @return Wartosci:
+  //!  @li 0 - zakończone;
+  //!  @li 1 - jeszcze trwa;
+  //!  @li -1 - wystąpił błąd.
+  //!
+  virtual int betweenRead()=0;
+  //!
+  //! Funkcja wykonywana pomiędzy zapisem nagłówków i body (funkcja do nadpisania).
+  //!
+  //! @return Wartosci:
+  //!  @li 0 - zakończone;
+  //!  @li 1 - jeszcze trwa;
+  //!  @li -1 - wystąpił błąd.
+  //!
+  virtual int betweenWrite()=0;
+  //!
   //! Obsługuje odczyt body (funkcja do nadpisania).
   //!
-  //! @param phase Aktualna faza odczytu.
+  //! @return Wartosci:
+  //!  @li 0 - zakończone;
+  //!  @li 1 - jeszcze trwa;
+  //!  @li -1 - wystąpił błąd.
   //!
-  virtual void bodyRead(phase_t phase)=0;
+  virtual int bodyRead()=0;
   //!
   //! Obsługuje zapis body (funkcja do nadpisania).
   //!
-  //! @param phase Aktualna faza zapisu.
+  //! @return Wartosci:
+  //!  @li 0 - zakończone;
+  //!  @li 1 - jeszcze trwa;
+  //!  @li -1 - wystąpił błąd.
   //!
-  virtual void bodyWrite(phase_t phase)=0;
+  virtual int bodyWrite()=0;
+  //!
+  //! Funkcja wykonywana po odczytaniu body (funkcja do nadpisania).
+  //!
+  //! @return Wartosci:
+  //!  @li 0 - zakończone;
+  //!  @li 1 - jeszcze trwa;
+  //!  @li -1 - wystąpił błąd.
+  //!
+  virtual int afterRead()=0;
+  //!
+  //! Funkcja wykonywana po zapisaniu body (funkcja do nadpisania).
+  //!
+  //! @return Wartosci:
+  //!  @li 0 - zakończone;
+  //!  @li 1 - jeszcze trwa;
+  //!  @li -1 - wystąpił błąd.
+  //!
+  virtual int afterWrite()=0;
 public:
   Headers(bool serverIn=true):
     server(serverIn),
-    reading_phase(serverIn?phase_start:phase_body),
-    writing_phase(serverIn?phase_body:phase_start){}
+    reading_phase(serverIn?phase_before:phase_end),
+    writing_phase(serverIn?phase_end:phase_before){}
 };
 //============================================
 class Body : public Headers{
@@ -206,8 +269,14 @@ private:
   //!  @li -1 - wystąpił błąd.
   //!
   int write_body(std::string & body,std::size_t & content_length);
-  void bodyRead(phase_t phase);
-  void bodyWrite(phase_t phase);
+  int beforeRead();
+  int beforeWrite();
+  int betweenRead();
+  int betweenWrite();
+  int bodyRead();
+  int bodyWrite();
+  int afterRead();
+  int afterWrite();
 protected:
   std::string request_body;
   std::string response_body;

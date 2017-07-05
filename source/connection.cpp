@@ -61,11 +61,12 @@ void TopString::doRead(){
   stringRead();
 }
 void TopString::doWrite(){
-  stringWrite();
-  if(0<writeString.size()){
+  if (0<writeString.size()){
     writeSize=writeString.copy((char*)writeData,bufferSize);
     writeString.erase(0,writeSize);
     asyncWrite();
+  } else {
+    stringWrite();
   }
 }
 //============================================

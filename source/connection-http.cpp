@@ -412,47 +412,71 @@ int Headers::read_all_headers(){
 int Headers::write_all_headers(){
   return(server?write_response():write_request());
 }
-void  Headers::stringRead(){
-  if (reading_phase==phase_start){
-    LOGGER_DEBUG<<__LOGGER__<<"read - phase_start"<<std::endl;
-    bodyRead(phase_start);
-    reading_phase=phase_headers;
+#define READ_WRITE_2(operation)\
+  switch (operation){ \
+    case 0:break; \
+    case 1:return; \
+    default:doClose();return; \
   }
-  if (!reading_phase){
-    switch(read_all_headers()){
-      case 0:{
-        LOGGER_DEBUG<<__LOGGER__<<"read - phase_headers"<<std::endl;
-        bodyRead(phase_headers);
-        reading_phase=phase_body;
-      }break;
-      case 1:break;
-      default:doClose();break;
+void Headers::stringRead(){
+  switch(reading_phase){
+    case phase_before:{
+      LOGGER_DEBUG<<__LOGGER__<<"read - phase_start"<<std::endl;
+      READ_WRITE_2(beforeRead());
+      reading_phase=phase_headers;
     }
-  } else {
-    LOGGER_DEBUG<<__LOGGER__<<"read - phase_body"<<std::endl;
-    bodyRead(phase_body);
+    case phase_headers:{
+      LOGGER_DEBUG<<__LOGGER__<<"read - phase_headers"<<std::endl;
+      READ_WRITE_2(read_all_headers());
+      reading_phase=phase_between;
+    }
+    case phase_between:{
+      LOGGER_DEBUG<<__LOGGER__<<"read - phase_between"<<std::endl;
+      READ_WRITE_2(betweenRead());
+      reading_phase=phase_body;
+    }
+    case phase_body:{
+      LOGGER_DEBUG<<__LOGGER__<<"read - phase_body"<<std::endl;
+      READ_WRITE_2(bodyRead());
+      reading_phase=phase_after;
+    }
+    case phase_after:{
+      LOGGER_DEBUG<<__LOGGER__<<"read - phase_after"<<std::endl;
+      READ_WRITE_2(afterRead());
+      reading_phase=phase_end;
+    }
+    default:break;
   }
-  if (readString.size()<10000000) asyncRead();
+  asyncRead();
 }
 void Headers::stringWrite(){
-  if (writing_phase==phase_start){
-    LOGGER_DEBUG<<__LOGGER__<<"write - phase_start"<<std::endl;
-    bodyWrite(phase_start);
-    writing_phase=phase_headers;
-  }
-  if (!writing_phase){
-    switch(write_all_headers()){
-      case 0:{
-        LOGGER_DEBUG<<__LOGGER__<<"write - phase_headers"<<std::endl;
-        bodyWrite(phase_headers);
-        writing_phase=phase_body;
-      }break;
-      case 1:break;
-      default:doClose();break;
+  switch(writing_phase){
+    case phase_before:{
+      LOGGER_DEBUG<<__LOGGER__<<"read - phase_start"<<std::endl;
+      READ_WRITE_2(beforeRead());
+      writing_phase=phase_headers;
     }
-  } else {
-    LOGGER_DEBUG<<__LOGGER__<<"write - phase_body"<<std::endl;
-    bodyWrite(phase_body);
+    case phase_headers:{
+      LOGGER_DEBUG<<__LOGGER__<<"read - phase_headers"<<std::endl;
+      READ_WRITE_2(read_all_headers());
+      writing_phase=phase_between;
+    }
+    case phase_between:{
+      LOGGER_DEBUG<<__LOGGER__<<"read - phase_between"<<std::endl;
+      READ_WRITE_2(betweenRead());
+      writing_phase=phase_body;
+    }
+    case phase_body:{
+      LOGGER_DEBUG<<__LOGGER__<<"read - phase_body"<<std::endl;
+      READ_WRITE_2(bodyRead());
+      writing_phase=phase_after;
+    }
+    case phase_after:{
+      LOGGER_DEBUG<<__LOGGER__<<"read - phase_after"<<std::endl;
+      READ_WRITE_2(afterRead());
+      writing_phase=phase_end;
+    }
+    default:break;
   }
   if (0<writeString.size()) asyncWrite();
 }
@@ -488,71 +512,63 @@ int Body::write_body(std::string & body,std::size_t & content_length){
   if (body.size()==0) return(0);
   return(1);
 }
-void Body::bodyRead(phase_t phase){
-  switch(phase){
-    case phase_start:{
-      if (getServer()) {
-        beforeRequest();
-      } else {
-        beforeResponse();
-      }
-    }break;
-    case phase_headers:{
-      if (getServer()) {
-        get_content_length(request_headers,request_content_length);
-        request_body.clear();
-      } else {
-        get_content_length(response_headers,response_content_length);
-        response_body.clear();
-      }
-    }
-    default:{
-      switch (getServer()?read_body(request_body,request_content_length):read_body(response_body,response_content_length)){
-        case 0:{
-          if (getServer()) {
-            afterRequest();
-          } else {
-            afterResponse();
-          }
-        }break;
-        case 1:break;
-        default:doClose();break;
-      }
-    }break;
+int Body::beforeRead(){
+  if (getServer()) {
+    beforeRequest();
+  } else {
+    beforeResponse();
   }
+  return(0);
 }
-void Body::bodyWrite(phase_t phase){
-  switch(phase){
-    case phase_start:{
-      if (getServer()) {
-        beforeResponse();
-      } else {
-        beforeRequest();
-      }
-    }break;
-    case phase_headers:{
-      if (getServer()) {
-        response_content_length=response_body.size();
-        set_content_length(response_headers,response_content_length);
-      } else {
-        request_content_length=request_body.size();
-        set_content_length(request_headers,request_content_length);
-      }
-    }
-    default:{
-      switch (getServer()?write_body(response_body,response_content_length):write_body(request_body,request_content_length)){
-        case 0:{
-          if (getServer()) {
-            afterResponse();
-          } else {
-            afterRequest();
-          }
-        }break;
-        case 1:break;
-        default:doClose();break;
-      }
-    }break;
+int Body::beforeWrite(){
+  if (getServer()) {
+    beforeResponse();
+  } else {
+    beforeRequest();
   }
+  return(0);
+}
+int Body::betweenRead(){
+  if (getServer()) {
+    get_content_length(request_headers,request_content_length);
+    request_body.clear();
+  } else {
+    get_content_length(response_headers,response_content_length);
+    response_body.clear();
+  }
+  return(0);
+}
+int Body::betweenWrite(){
+  if (getServer()) {
+    response_content_length=response_body.size();
+    set_content_length(response_headers,response_content_length);
+  } else {
+    request_content_length=request_body.size();
+    set_content_length(request_headers,request_content_length);
+  }
+  return(0);
+}
+int Body::bodyRead(){
+  return(getServer()?read_body(request_body,request_content_length):read_body(response_body,response_content_length));
+}
+int Body::bodyWrite(){
+  return(getServer()?write_body(response_body,response_content_length):write_body(request_body,request_content_length));
+}
+int Body::afterRead(){
+  if (getServer()) {
+    afterRequest();
+  } else {
+    afterResponse();
+  }
+  return(0);
+}
+int Body::afterWrite(){
+  if (getServer()) {
+    afterResponse();
+  } else {
+    afterRequest();
+  }
+  return(0);
 }
 //============================================
 }}}}
