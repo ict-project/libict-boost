@@ -173,16 +173,22 @@ private:
   //! Odczyt body.
   //!
   //! @param content_length Probrane z nagłówka content_length.
-  //! @return Jeśli skończył to 'true'.
+  //! @return Wartosci:
+  //!  @li 0 - zakończone;
+  //!  @li 1 - jeszcze trwa;
+  //!  @li -1 - wystąpił błąd.
   //!
-  bool read_body(std::string & body,std::size_t & content_length);
+  int read_body(std::string & body,std::size_t & content_length);
   //!
   //! Zapis body.
   //!
   //! @param content_length Ustawione w nagłówku content_length.
-  //! @return Jeśli skończył to 'true'.
+  //! @return Wartosci:
+  //!  @li 0 - zakończone;
+  //!  @li 1 - jeszcze trwa;
+  //!  @li -1 - wystąpił błąd.
   //!
-  bool write_body(std::string & body,std::size_t & content_length);
+  int write_body(std::string & body,std::size_t & content_length);
   void bodyRead(phase_t phase);
   void bodyWrite(phase_t phase);
 protected:

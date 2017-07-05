@@ -469,20 +469,22 @@ void Body::set_content_length(headers_t & headers,std::size_t & size){
   if (headers.count(_content_length_)) headers.erase(_content_length_);
   if (size) headers[_content_length_].push_back(std::to_string(size));
 }
-bool Body::read_body(std::string & body,std::size_t & content_length){
+int Body::read_body(std::string & body,std::size_t & content_length){
   std::size_t s=(content_length>body.size())?(content_length-body.size()):0;
   if (s){
     body.append(readString,0,s);
     readString.erase(0,s);
   }
-  return(body.size()==content_length);
+  if (body.size()==content_length) return(0);
+  return(1);
 }
-bool Body::write_body(std::string & body,std::size_t & content_length){
+int Body::write_body(std::string & body,std::size_t & content_length){
   if ((body.size()+writeString.size())<writeString.max_size()){
     writeString+=body;
     body.clear();
   }
-  return(body.size()==0);
+  if (body.size()==0) return(0);
+  return(1);
 }
 void Body::bodyRead(phase_t phase){
   switch(phase){
@@ -503,15 +505,16 @@ void Body::bodyRead(phase_t phase){
       }
     }
     default:{
-      if (getServer()?read_body(request_body,request_content_length):read_body(response_body,response_content_length)){
-        if (getServer()) {
-          afterRequest();
-        } else {
-          afterResponse();
-        }
-        headersRead();
-      } else {
-        asyncRead();
+      switch (getServer()?read_body(request_body,request_content_length):read_body(response_body,response_content_length)){
+        case 0:{
+          if (getServer()) {
+            afterRequest();
+          } else {
+            afterResponse();
+          }
+        }break;
+        case 1:asyncRead();break;
+        default:doClose();break;
       }
     }break;
   }
@@ -535,15 +538,16 @@ void Body::bodyWrite(phase_t phase){
       }
     }
     default:{
-      if (getServer()?write_body(response_body,response_content_length):write_body(request_body,request_content_length)){
-        if (getServer()) {
-          afterResponse();
-        } else {
-          afterRequest();
-        }
-        headersWrite();
-      } else {
-        asyncWrite();
+      switch (getServer()?write_body(response_body,response_content_length):write_body(request_body,request_content_length)){
+        case 0:{
+          if (getServer()) {
+            afterResponse();
+          } else {
+            afterRequest();
+          }
+        }break;
+        case 1:asyncRead();break;
+        default:doClose();break;
       }
     }break;
   }
