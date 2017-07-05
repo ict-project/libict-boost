@@ -422,7 +422,6 @@ void  Headers::stringRead(){
     switch(read_all_headers()){
       case 0:{
         LOGGER_DEBUG<<__LOGGER__<<"read - phase_headers"<<std::endl;
-        asyncRead();
         bodyRead(phase_headers);
         reading_phase=phase_body;
       }break;
@@ -444,7 +443,6 @@ void Headers::stringWrite(){
     switch(write_all_headers()){
       case 0:{
         LOGGER_DEBUG<<__LOGGER__<<"write - phase_headers"<<std::endl;
-        asyncWrite();
         bodyWrite(phase_headers);
         writing_phase=phase_body;
       }break;
@@ -509,7 +507,6 @@ void Body::bodyRead(phase_t phase){
     default:{
       switch (getServer()?read_body(request_body,request_content_length):read_body(response_body,response_content_length)){
         case 0:{
-          asyncRead();
           if (getServer()) {
             afterRequest();
           } else {
@@ -543,7 +540,6 @@ void Body::bodyWrite(phase_t phase){
     default:{
       switch (getServer()?write_body(response_body,response_content_length):write_body(request_body,request_content_length)){
         case 0:{
-          asyncWrite();
           if (getServer()) {
             afterResponse();
           } else {
