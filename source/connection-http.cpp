@@ -425,13 +425,14 @@ void  Headers::stringRead(){
         bodyRead(phase_headers);
         reading_phase=phase_body;
       }break;
-      case 1:asyncRead();break;
+      case 1:break;
       default:doClose();break;
     }
   } else {
     LOGGER_DEBUG<<__LOGGER__<<"read - phase_body"<<std::endl;
     bodyRead(phase_body);
   }
+  if (readString.size()<10000000) asyncRead();
 }
 void Headers::stringWrite(){
   if (writing_phase==phase_start){
@@ -442,18 +443,18 @@ void Headers::stringWrite(){
   if (!writing_phase){
     switch(write_all_headers()){
       case 0:{
-        asyncWrite();
         LOGGER_DEBUG<<__LOGGER__<<"write - phase_headers"<<std::endl;
         bodyWrite(phase_headers);
         writing_phase=phase_body;
       }break;
-      case 1:asyncWrite();break;
+      case 1:break;
       default:doClose();break;
     }
   } else {
     LOGGER_DEBUG<<__LOGGER__<<"write - phase_body"<<std::endl;
     bodyWrite(phase_body);
   }
+  if (0<writeString.size()) asyncWrite();
 }
 //============================================
 void Body::get_content_length(headers_t & headers,std::size_t & size){
@@ -514,7 +515,7 @@ void Body::bodyRead(phase_t phase){
             afterResponse();
           }
         }break;
-        case 1:asyncRead();break;
+        case 1:break;
         default:doClose();break;
       }
     }break;
@@ -541,14 +542,13 @@ void Body::bodyWrite(phase_t phase){
     default:{
       switch (getServer()?write_body(response_body,response_content_length):write_body(request_body,request_content_length)){
         case 0:{
-          asyncWrite();
           if (getServer()) {
             afterResponse();
           } else {
             afterRequest();
           }
         }break;
-        case 1:asyncWrite();break;
+        case 1:break;
         default:doClose();break;
       }
     }break;

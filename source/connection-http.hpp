@@ -151,7 +151,8 @@ protected:
       response_msg.clear();
       response_headers.clear();
     }
-    reading_phase=phase_start;asyncRead();
+    reading_phase=phase_start;
+    asyncRead();
   }
   //! Rozpoczyna zapis nagłówków.
   void headersWrite(){
