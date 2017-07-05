@@ -57,14 +57,14 @@ void TopString::doRead(){
     readString.append((char*)readData,readSize);
     readSize=0;
   }
-  stringRead();
+  if(!readString.size()) stringRead();
 }
 void TopString::doWrite(){
-  stringWrite();
-  while(writeString.size()){
+  if(writeString.size()) stringWrite();
+  if(0<writeString.size()){
     writeSize=writeString.copy((char*)writeData,bufferSize);
     writeString.erase(0,writeSize);
-    if (writeString.size()) asyncWrite();
+    asyncWrite();
   }
 }
 //============================================
