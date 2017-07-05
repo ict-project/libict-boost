@@ -541,6 +541,7 @@ void Body::bodyWrite(phase_t phase){
     default:{
       switch (getServer()?write_body(response_body,response_content_length):write_body(request_body,request_content_length)){
         case 0:{
+          asyncWrite();
           if (getServer()) {
             afterResponse();
           } else {
