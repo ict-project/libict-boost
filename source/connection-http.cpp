@@ -414,29 +414,45 @@ int Headers::write_all_headers(){
 }
 void  Headers::stringRead(){
   if (reading_phase==phase_start){
+    LOGGER_DEBUG<<__LOGGER__<<"read - phase_start"<<std::endl;
     bodyRead(phase_start);
     reading_phase=phase_headers;
   }
   if (!reading_phase){
     switch(read_all_headers()){
-      case 0:bodyRead(phase_headers);reading_phase=phase_body;break;
+      case 0:{
+        LOGGER_DEBUG<<__LOGGER__<<"read - phase_headers"<<std::endl;
+        bodyRead(phase_headers);
+        reading_phase=phase_body;
+      }break;
       case 1:asyncRead();break;
       default:break;
     }
-  } else bodyRead(phase_body);
+  } else {
+    LOGGER_DEBUG<<__LOGGER__<<"read - phase_body"<<std::endl;
+    bodyRead(phase_body);
+  }
 }
 void Headers::stringWrite(){
   if (writing_phase==phase_start){
+    LOGGER_DEBUG<<__LOGGER__<<"write - phase_start"<<std::endl;
     bodyWrite(phase_start);
     writing_phase=phase_headers;
   }
   if (!writing_phase){
     switch(write_all_headers()){
-      case 0:bodyWrite(phase_headers);writing_phase=phase_body;break;
+      case 0:{
+        LOGGER_DEBUG<<__LOGGER__<<"write - phase_start"<<std::endl;
+        bodyWrite(phase_headers);
+        writing_phase=phase_body;
+      }break;
       case 1:asyncWrite();break;
       default:break;
     }
-  } else bodyWrite(phase_body);
+  } else {
+    LOGGER_DEBUG<<__LOGGER__<<"write - phase_start"<<std::endl;
+    bodyWrite(phase_body);
+  }
 }
 //============================================
 void Body::get_content_length(headers_t & headers,std::size_t & size){
