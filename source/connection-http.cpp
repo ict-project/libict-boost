@@ -674,17 +674,17 @@ int Body::afterRead(){
     transform_name(connection);
     if (request_version==_HTTP_1_1_){
       response_version=_HTTP_1_1_;
-      if (connection==_keep_alive_){
-        keep_alive=true;
-      } else {
-        keep_alive=false;
-      }
-    } else {
-      response_version=_HTTP_1_0_;
       if (connection==_close_){
         keep_alive=false;
       } else {
         keep_alive=true;
+      }
+    } else {
+      response_version=_HTTP_1_0_;
+      if (connection==_keep_alive_){
+        keep_alive=true;
+      } else {
+        keep_alive=false;
       }
     }
     READ_WRITE_1(afterRequest())
@@ -693,16 +693,16 @@ int Body::afterRead(){
     get_single_header(response_headers,_connection_,connection);
     transform_name(connection);
     if (response_version==_HTTP_1_1_){
-      if (connection==_keep_alive_){
-        keep_alive=true;
-      } else {
-        keep_alive=false;
-      }
-    } else {
       if (connection==_close_){
         keep_alive=false;
       } else {
         keep_alive=true;
+      }
+    } else {
+      if (connection==_keep_alive_){
+        keep_alive=true;
+      } else {
+        keep_alive=false;
       }
     }
     READ_WRITE_1(afterResponse())
