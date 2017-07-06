@@ -76,16 +76,13 @@ extern const std::string _HTTP_1_0_;
 extern const std::string _HTTP_1_1_;
 extern const std::string _content_length_;
 extern const std::string _content_type_;
+extern const std::string _connection_;
 extern header_config_t default_config;
 extern config_t config;
 //===========================================
 class Headers : public ict::boost::connection::TopString {
 private:
   bool server;
-  //! Normalizuje nazwę nagłówka (małe litery ASCII).
-  void transform_name(std::string & name);
-  //! Normalizuje wartość nagłówka i elementu start line (litery ASCII).
-  void transform_value(std::string & value);
   //! Odczytuje pierwszy lub drugi element start line.
   int read_start_element(std::string & output,std::size_t min,std::size_t max,const std::string & descr);
   //! Zapisuje pierwszy lub drugi element start line.
@@ -125,6 +122,10 @@ private:
   phase_t writing_phase;
   void stringWrite();
 protected:
+  //! Normalizuje nazwę nagłówka (małe litery ASCII).
+  void transform_name(std::string & name);
+  //! Normalizuje wartość nagłówka i elementu start line (litery ASCII).
+  void transform_value(std::string & value);
   bool getServer(){return(server);}
   void doStart(){
     if (server) {
@@ -243,12 +244,15 @@ public:
 //============================================
 class Body : public Headers{
 private:
+  bool keep_alive=false;
   std::size_t request_content_length=0;
   std::size_t response_content_length=0;
+  void get_single_header(headers_t & headers,const std::string & name,std::string & value);
+  void set_single_header(headers_t & headers,const std::string & name,const std::string & value);
   //! Pobiera z nagłówków content_length.
   void get_content_length(headers_t & headers,std::size_t & size);
   //! Ustawia w nagłówkach content_length.
-  void set_content_length(headers_t & headers,std::size_t & size);
+  void set_content_length(headers_t & headers,const std::size_t & size);
   //!
   //! Odczyt body.
   //!
@@ -277,9 +281,18 @@ private:
   int bodyWrite();
   int afterRead();
   int afterWrite();
+  void before_request();
+  void after_request();
+  void before_response();
+  void after_response();
 protected:
   std::string request_body;
   std::string response_body;
+  void setResponseCode(unsigned int code);
+  void getSingleRequestHeader(const std::string & name,std::string & value){get_single_header(request_headers,name,value);}
+  void setSingleRequestHeader(const std::string & name,const std::string & value){set_single_header(request_headers,name,value);}
+  void getSingleResponseHeader(const std::string & name,std::string & value){get_single_header(response_headers,name,value);}
+  void setSingleResponseHeader(const std::string & name,const std::string & value){set_single_header(response_headers,name,value);}
   //!
   //! Operacje przed request.
   //!
