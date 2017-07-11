@@ -264,7 +264,7 @@ int Headers::read_headers(headers_t & headers){
   const static std::string _too_small_(" - too small...");
   const static std::string _missing_(" - missing...");
   const static std::size_t max_header_line_size(10000);
-  const static std::size_t min_header_name_size(5);
+  const static std::size_t min_header_name_size(3);
   const static std::size_t max_header_name_size(100);
   std::size_t e;
   while((e=readString.find(endl))!=std::string::npos){
