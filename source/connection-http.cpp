@@ -59,6 +59,8 @@ const std::string _HTTP_1_0_("HTTP/1.0");
 const std::string _HTTP_1_1_("HTTP/1.1");
 const std::string _content_length_("content-length");
 const std::string _content_type_("content-type");
+const std::string _cookie_("cookie");
+const std::string _set_cookie_("set-cookie");
 const std::string _connection_("connection");
 header_config_t default_config={.multiple_values=true,.multiple_lines=true};
 config_t config={

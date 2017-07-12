@@ -77,6 +77,8 @@ extern const std::string _HTTP_1_1_;
 extern const std::string _content_length_;
 extern const std::string _content_type_;
 extern const std::string _connection_;
+extern const std::string _cookie_;
+extern const std::string _set_cookie_;
 extern header_config_t default_config;
 extern config_t config;
 //===========================================
