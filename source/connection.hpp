@@ -224,6 +224,7 @@ template<class Socket,class Stack>void Bottom<Socket,Stack>::asyncRead(){
         }
       } catch (std::exception& e) {
         LOGGER_ERR<<__LOGGER__<<"Exception: "<<e.what()<<std::endl;
+        doClose();
       }
     }
   );
@@ -255,6 +256,7 @@ template<class Socket,class Stack>void Bottom<Socket,Stack>::asyncWrite(){
         }
       } catch (std::exception& e) {
         LOGGER_ERR<<__LOGGER__<<"Exception: "<<e.what()<<std::endl;
+        doClose();
       }
     }
   );
