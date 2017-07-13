@@ -196,7 +196,7 @@ template<class Socket,class Stack>void Bottom<Socket,Stack>::scheduleMinFlow() {
       }
     }
   );
-  LOGGER_DEBUG<<__LOGGER__<<"Connection "<<Stack::socketDesc()<<" use count: "<<self.use_count()<<std::endl;
+  LOGGER_DEBUG<<__LOGGER__<<"Connection "<<Stack::socketDesc()<<": use_count()="<<self.use_count()<<", readFlow="<<readFlow<<", writeFlow="<<writeFlow<<std::endl;
 }
 template<class Socket,class Stack>void Bottom<Socket,Stack>::asyncRead(){
   auto self(Stack::shared_from_this());
