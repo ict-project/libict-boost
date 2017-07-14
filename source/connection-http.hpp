@@ -39,6 +39,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <map>
 #include <vector>
 #include "connection.hpp"
+#include "../libict/source/time.hpp"
 //============================================
 namespace ict { namespace boost { namespace connection { namespace http {
 //===========================================
@@ -79,6 +80,7 @@ extern const std::string _content_type_;
 extern const std::string _connection_;
 extern const std::string _cookie_;
 extern const std::string _set_cookie_;
+extern const std::string _forwarded_;
 extern header_config_t default_config;
 extern config_t config;
 //===========================================
@@ -125,9 +127,11 @@ private:
   void stringWrite();
 protected:
   //! Normalizuje nazwę nagłówka (małe litery ASCII).
-  void transform_name(std::string & name);
+  static void transform_name(std::string & name);
   //! Normalizuje wartość nagłówka i elementu start line (litery ASCII).
-  void transform_value(std::string & value);
+  static void transform_value(std::string & value);
+  static void headerKeyValueParser(const std::string & input,std::map<std::string,std::string> & output);
+  static std::string headerSetCookieHeader(const std::string & name,const std::string & value,ict::time::unix_t maxAge=-1,const std::string & path="",const std::string & domain="",bool secure=true,bool httpOnly=true);
   bool getServer(){return(server);}
   void doStart(){
     if (server) {

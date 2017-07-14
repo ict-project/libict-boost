@@ -35,6 +35,7 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **************************************************************/
 //============================================
 #include "connection-http.hpp"
+#include <regex>
 //============================================
 #ifdef ENABLE_TESTING
 #include "test.hpp"
@@ -62,6 +63,7 @@ const std::string _content_type_("content-type");
 const std::string _cookie_("cookie");
 const std::string _set_cookie_("set-cookie");
 const std::string _connection_("connection");
+const std::string _forwarded_("forwarded");
 header_config_t default_config={.multiple_values=true,.multiple_lines=true};
 config_t config={
   {_content_length_,      {.multiple_values=false,.multiple_lines=false}},
@@ -82,6 +84,54 @@ void Headers::transform_value(std::string & value){
   });
   value.erase(value.begin(),std::find_if(value.begin(),value.end(),std::not1(std::ptr_fun<int,int>(std::isspace))));
   value.erase(std::find_if(value.rbegin(),value.rend(),std::not1(std::ptr_fun<int,int>(std::isspace))).base(),value.end());
+}
+void Headers::headerKeyValueParser(const std::string & input,std::map<std::string,std::string> & output){
+  std::string s(input);
+  std::smatch m;
+  std::regex e("\\s*([^;=]+)\\s*(=([^;]*))?;?");
+  output.clear();
+  while (std::regex_search(s,m,e)) {
+    if (m.size()==2){
+      output[m[1]]="";
+    } else if (m.size()>3){
+      std::string tmp(m[3]);
+      if ((tmp.front()=='"')&&(tmp.back()=='"')){
+        output[m[1]]=tmp.substr(1,tmp.size()-2);
+      } else {
+        output[m[1]]=tmp;
+      }
+    }
+    s=m.suffix().str();
+  }
+}
+std::string Headers::headerSetCookieHeader(const std::string & name,const std::string & value,ict::time::unix_t maxAge,const std::string & path,const std::string & domain,bool secure,bool httpOnly){
+  std::string out;
+  out+=name;
+  out+="=";
+  out+=value;
+  out+="; ";
+  if (maxAge!=-1){
+    out+="Max-Age=";
+    out+=std::to_string(maxAge);
+    out+="; ";
+  }
+  if (path.size()){
+    out+="path=";
+    out+=path;
+    out+="; ";
+  }
+  if (domain.size()){
+    out+="path=";
+    out+=domain;
+    out+="; ";
+  }
+  if (secure){
+    out+="Secure; ";
+  }
+  if (httpOnly){
+    out+="HttpOnly; ";
+  }
+  return(out);
 }
 //! Odczytuje pierwszy lub drugi element start line.
 int Headers::read_start_element(std::string & output,std::size_t min,std::size_t max,const std::string & descr){
