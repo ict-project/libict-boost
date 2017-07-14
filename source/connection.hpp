@@ -51,7 +51,7 @@ class Top : public std::enable_shared_from_this<Top>, public ict::reg::Base {
 protected:
   typedef std::enable_shared_from_this<Top> enable_shared_t;
   //! Opis połączenia.
-  std::string sDesc;
+  std::string sDesc,sLocal,sRemote;
   //! Rozmiar lokalnego bufora (zapisu i odczytu).
   enum {bufferSize=1024};
   //! Lokalny bufor odczytu.
@@ -111,6 +111,8 @@ public:
   virtual ~Top();
   //! Zwraca opis połączenia.
   std::string socketDesc() const;
+  std::string socketLocal() const;
+  std::string socketRemote() const;
 };
 //============================================
 //! Stos do obsługi połączenia za pomocą bufora std::string  - góra.
@@ -268,6 +270,10 @@ template<class Socket,class Stack>Bottom<Socket,Stack>::Bottom(Socket & socket):
   LOGGER_INFO<<__LOGGER__<<"smpp::connection::Connection has been created ..."<<std::endl;
   out<<"{local:"<<s.local_endpoint()<<", remote:"<<s.remote_endpoint()<<", ptr:"<<this<<"}";
   Stack::sDesc=out.str();
+  out.str("");out<<s.local_endpoint();
+  Stack::sLocal=out.str();
+  out.str("");out<<s.remote_endpoint();
+  Stack::sRemote=out.str();
 }
 template<class Socket,class Stack> void Bottom<Socket,Stack>::initThis() {
   scheduleMinFlow();

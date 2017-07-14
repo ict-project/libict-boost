@@ -49,6 +49,12 @@ Top::~Top(){
 std::string Top::socketDesc() const {
   return(sDesc);
 }
+std::string Top::socketLocal() const {
+  return(sLocal);
+}
+std::string Top::socketRemote() const {
+  return(sRemote);
+}
 //============================================
 TopString::~TopString(){
 }
