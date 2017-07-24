@@ -250,7 +250,6 @@ public:
 //============================================
 class Body : public Headers{
 private:
-  bool keep_alive=false;
   std::size_t request_content_length=0;
   std::size_t response_content_length=0;
   void get_single_header(headers_t & headers,const std::string & name,std::string & value);
@@ -292,6 +291,7 @@ private:
   void before_response();
   void after_response();
 protected:
+  bool keep_alive=false;
   std::string request_body;
   std::string response_body;
   void setResponseCode(unsigned int code);
