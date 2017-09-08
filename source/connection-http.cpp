@@ -554,7 +554,9 @@ void Body::get_content_length(headers_t & headers,std::size_t & size){
 }
 void Body::set_content_length(headers_t & headers,const std::size_t & size){
   std::string value;
-  if (size) value=std::to_string(size);
+  if (size) {
+    value=std::to_string(size);
+  } else if (getServer()) if (request_method=="OPTIONS") value="0";
   set_single_header(headers,_content_length_,value);
 }
 int Body::read_body(std::string & body,std::size_t & content_length){
