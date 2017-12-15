@@ -81,16 +81,16 @@ protected:
   //! Zmusza stos do wykonania odczytu na gnieździe.
   //! Funkcja do nadpisania przez stos (opcjonalnie).
   //!
-  //! @param ec Błąd zwrócony przez funkcje asynchronicznego odczytu.
+  //! @param ec Błąd odczytu (jeśli wystąpił).
   //!
-  virtual void execRead(const ::boost::system::error_code & ec){};
+  virtual void execRead(::boost::system::error_code & ec){};
   //!
   //! Zmusza stos do wykonania zapisu na gnieździe.
   //! Funkcja do nadpisania przez stos (opcjonalnie).
   //!
-  //! @param ec Błąd zwrócony przez funkcje asynchronicznego zapisu.
+  //! @param ec Błąd zapisu (jeśli wystąpił).
   //!
-  virtual void execWrite(const ::boost::system::error_code & ec){};
+  virtual void execWrite(::boost::system::error_code & ec){};
   //!
   //! Zwraca deskryptor gniazda używanogo przez stos.
   //! Funkcja do nadpisania przez stos (obowiązkowo).
@@ -140,7 +140,7 @@ template<class Socket,class Stack>void Bottom<Socket,Stack>::startOperationsLoca
     readInProgress=true;
     socketPtr->async_read_some(
       ::boost::asio::null_buffers(),
-      [this,self](const ::boost::system::error_code & ec,std::size_t length){
+      [this,self](::boost::system::error_code & ec,std::size_t length){
         LOGGER_LAYER;
         readInProgress=false;
         if (!ec) Stack::execRead(ec);
@@ -159,7 +159,7 @@ template<class Socket,class Stack>void Bottom<Socket,Stack>::startOperationsLoca
     writeInProgress=true;
     socketPtr->async_write_some(
       ::boost::asio::null_buffers(),
-      [this,self](const ::boost::system::error_code & ec,std::size_t length){
+      [this,self](::boost::system::error_code & ec,std::size_t length){
         LOGGER_LAYER;
         writeInProgress=false;
         if (!ec) Stack::execWrite(ec);
@@ -182,16 +182,24 @@ template<class Socket,class Stack>void Bottom<Socket,Stack>::createSocket(std::u
   if (s){
     l=sizeof(s_type);
     ::getsockopt(s,SOL_SOCKET,SO_TYPE,&s_type,&l);
+    #ifdef __linux__
     l=sizeof(s_domain);
     ::getsockopt(s,SOL_SOCKET,SO_DOMAIN,&s_domain,&l);
+    #endif
     if (s_type==SOCK_STREAM) switch (s_domain){
+      #ifdef __linux__
       case AF_INET:
         ptr.reset(new ::boost::asio::ip::tcp::socket(io_service,::boost::asio::ip::tcp::v4(),s));
         break;
       case AF_INET6:
         ptr.reset(new ::boost::asio::ip::tcp::socket(io_service,::boost::asio::ip::tcp::v6(),s));
         break;
-      default:break;
+      #endif
+      default:
+      #ifdef __APPLE__
+        ptr.reset(new ::boost::asio::ip::tcp::socket(io_service,::boost::asio::ip::tcp::v6(),s));
+      #endif
+      break;
     }
   }
   if (!ptr) {
