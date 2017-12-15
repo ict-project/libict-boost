@@ -39,7 +39,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 #include <map>
 #include <thread>
 #include <boost/asio.hpp>
-#include <boost/bind.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include "../libict/source/logger.hpp"
 #include "../libict/source/register.hpp"

@@ -35,7 +35,6 @@ OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
 **************************************************************/
 //============================================
 #include "asio.hpp"
-#include "../libict/source/logger.hpp"
 //============================================
 namespace ict { namespace boost { namespace asio {
 //============================================
