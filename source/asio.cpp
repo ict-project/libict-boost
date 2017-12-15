@@ -47,5 +47,16 @@ namespace ict { namespace boost { namespace asio {
   return(io[id]);
 }
 //============================================
+class StackExample: public Top{
+protected:
+  int getSocket() const{
+    return(-1);
+  }
+};
+class TcpExample : public Bottom<::boost::asio::ip::tcp::socket,StackExample>{
+};
+class StreamExample : public Bottom<::boost::asio::local::stream_protocol::socket,StackExample>{
+};
+//============================================
 }}}
 //============================================
