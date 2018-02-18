@@ -1,7 +1,7 @@
 ################################################################
 cmake_minimum_required(VERSION 2.6)
 ################################################################
-project(libict-boots)
+project(libict-boost)
 
 set(CMAKE_CXX_STANDARD 11)
 
@@ -26,14 +26,12 @@ set(CMAKE_SOURCE_FILES
   server.cpp
 )
 
-#add_library(ict STATIC ${CMAKE_SOURCE_FILES_ICT})
-
 add_library(ict-boost-static STATIC ${CMAKE_SOURCE_FILES})
 target_link_libraries(ict-boost-static pthread ${Boost_LIBRARIES} ict-static)
 set_target_properties(ict-boost-static  PROPERTIES OUTPUT_NAME ict-boost)
 
 #add_library(ict-boost-shared SHARED ${CMAKE_SOURCE_FILES})
-#target_link_libraries(ict-boost-shared pthread ict ${Boost_LIBRARIES})
+#target_link_libraries(ict-boost-shared pthread ict-static ${Boost_LIBRARIES})
 #set_target_properties(ict-boost-shared  PROPERTIES OUTPUT_NAME ict-boost)
 
 add_executable(libict-boost-test test.cpp ${CMAKE_SOURCE_FILES})
